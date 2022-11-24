@@ -1,5 +1,6 @@
 from pyspark.ml.classification import NaiveBayes
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
+from pyspark.ml.feature import OneHotEncoder
 
 sc = SparkContext('local')
 spark = SparkSession(sc)
@@ -10,15 +11,15 @@ data = spark.read.format("libsvm") \
 
 x_oh = OneHotEncoder(sparse=False)
 x_oh = x_oh.fit_transform(data[['OCCUPATION']])
-df_x_oh = pd.DataFrame(x_oh)
+df_x_oh = DataFrame(x_oh)
 df_x_oh
 
 y_oh = OneHotEncoder(sparse=False)
 y_oh = y_oh.fit_transform(data[[' MERK']])
-df_y_oh = pd.DataFrame(y_oh)
+df_y_oh = DataFrame(y_oh)
 df_y_oh
 
-concatenated = pd.concat([data, df_x_oh, df_y_oh], axis="columns")
+concatenated = concat([data, df_x_oh, df_y_oh], axis="columns")
 
 data_rev = concatenated.drop(["OCCUPATION"], axis = 1)
 data_rev_1 = data_rev.drop([" MERK"], axis = 1)
