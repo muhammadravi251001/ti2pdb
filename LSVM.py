@@ -1,46 +1,58 @@
 from pyspark.ml.classification import LinearSVC
+from pyspark.context import SparkContext, SparkSession
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
-from pyspark.ml.feature import OneHotEncoder
+from pyspark.ml.feature import StringIndexer, OneHotEncoder, VectorAssembler
+from pyspark.ml import Pipeline
 
-sc = SparkContext('local')
-spark = SparkSession(sc)
+if __name__ == "__main__":
 
-# Load training data
-data = spark.read.format("libsvm") \
-    .load("kredit.csv")
+    sc = SparkContext('local')
+    spark = SparkSession(sc)
 
-x_oh = OneHotEncoder(sparse=False)
-x_oh = x_oh.fit_transform(data[['OCCUPATION']])
-df_x_oh = DataFrame(x_oh)
-df_x_oh
+    # Load training data
+    data = spark.read.format("libsvm") \
+        .load("kredit.csv")
 
-y_oh = OneHotEncoder(sparse=False)
-y_oh = y_oh.fit_transform(data[[' MERK']])
-df_y_oh = DataFrame(y_oh)
-df_y_oh
+    categorical_columns= ['OCCUPATION', ' MERK']
 
-concatenated = concat([data, df_x_oh, df_y_oh], axis="columns")
+    # The index of string vlaues multiple columns
+    indexers = [
+        StringIndexer(inputCol=c, outputCol="{0}_indexed".format(c))
+        for c in categorical_columns
+    ]
 
-data_rev = concatenated.drop(["OCCUPATION"], axis = 1)
-data_rev_1 = data_rev.drop([" MERK"], axis = 1)
+    # The encode of indexed vlaues multiple columns
+    encoders = [OneHotEncoder(dropLast=False,inputCol=indexer.getOutputCol(),
+                outputCol="{0}_encoded".format(indexer.getOutputCol())) 
+        for indexer in indexers
+    ]
 
-# Split the data into train and test
-splits = data_rev_1.randomSplit([0.6, 0.4], 1234)
-train = splits[0]
-test = splits[1]
+    # Vectorizing encoded values
+    assembler = VectorAssembler(inputCols=[encoder.getOutputCol() for encoder in encoders],outputCol="features")
 
-# create the trainer and set its parameters
-lsvc = LinearSVC(maxIter=10, regParam=0.1)
+    pipeline = Pipeline(stages=indexers + encoders+[assembler])
+    model=pipeline.fit(data)
+    transformed = model.transform(data)
 
-# train the model
-model = lsvc.fit(train)
+    # Split the data into train and test
+    splits = transformed.randomSplit([0.6, 0.4], 1234)
+    train = splits[0]
+    test = splits[1]
 
-# select example rows to display.
-predictions = model.transform(test)
-predictions.show()
+    # create the trainer and set its parameters
+    lsvc = LinearSVC(maxIter=10, regParam=0.1)
 
-# compute accuracy on the test set
-evaluator = MulticlassClassificationEvaluator(labelCol="label", predictionCol="prediction",
-                                              metricName="accuracy")
-accuracy = evaluator.evaluate(predictions)
-print("Test set accuracy = " + str(accuracy))
+    # train the model
+    model = lsvc.fit(train)
+
+    # select example rows to display.
+    predictions = model.transform(test)
+    predictions.show()
+
+    # compute accuracy on the test set
+    evaluator = MulticlassClassificationEvaluator(labelCol="label", predictionCol="prediction",
+                                                metricName="accuracy")
+    accuracy = evaluator.evaluate(predictions)
+    print("Test set accuracy = " + str(accuracy))
+
+    spark.stop()
