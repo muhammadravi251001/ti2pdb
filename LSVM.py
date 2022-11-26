@@ -1,3 +1,5 @@
+# Script task klasifikasi - model Linear Support Vector Machine
+
 from pyspark.ml.classification import LinearSVC
 from pyspark.context import SparkContext
 from pyspark.sql import SparkSession

@@ -1,3 +1,5 @@
+# Script task klasifikasi - model Naive Bayes
+
 from pyspark.ml.classification import NaiveBayes
 from pyspark.context import SparkContext
 from pyspark.sql import SparkSession

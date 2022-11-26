@@ -1,3 +1,5 @@
+# Script task PySpark MapReduce - jumlah data STATUS
+
 from pyspark.sql import functions as F
 from pyspark.sql.functions import col,when,count
 from pyspark.sql import SparkSession

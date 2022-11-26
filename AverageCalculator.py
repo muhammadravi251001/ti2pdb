@@ -1,3 +1,5 @@
+# Script task PySpark MapReduce - rata-rata SALARY
+
 from pyspark.sql import functions as F
 from pyspark.sql import SparkSession
 import findspark
