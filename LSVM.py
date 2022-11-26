@@ -1,5 +1,6 @@
 from pyspark.ml.classification import LinearSVC
-from pyspark.context import SparkContext, SparkSession
+from pyspark.context import SparkContext
+from pyspark.sql import SparkSession
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 from pyspark.ml.feature import StringIndexer, OneHotEncoder, VectorAssembler
 from pyspark.ml import Pipeline
