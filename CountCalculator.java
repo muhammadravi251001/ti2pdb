@@ -12,7 +12,7 @@ import org.apache.hadoop.util.GenericOptionsParser;
 
 import java.io.IOException;
 
-public class AverageCalculator {
+public class CountCalculator {
 
     //Driver Class
     public static void main(String[] args) throws Exception {
@@ -21,10 +21,10 @@ public class AverageCalculator {
         String[] files = new GenericOptionsParser(c, args).getRemainingArgs();
         Path input = new Path(files[0]);
         Path output = new Path(files[1]);
-        Job j = new Job(c, "averageCalculator");
-        j.setJarByClass(AverageCalculator.class);
-        j.setMapperClass(MapForAverage.class);
-        j.setReducerClass(ReduceForAverage.class);
+        Job j = new Job(c, "countCalculator");
+        j.setJarByClass(CountCalculator.class);
+        j.setMapperClass(MapForCount.class);
+        j.setReducerClass(ReduceForCount.class);
         j.setOutputKeyClass(Text.class);
         j.setOutputValueClass(FloatWritable.class);
 
@@ -42,7 +42,7 @@ public class AverageCalculator {
 
 
     //Mapper
-    public static class MapForAverage extends Mapper<LongWritable, Text, Text, FloatWritable> {
+    public static class MapForCount extends Mapper<LongWritable, Text, Text, FloatWritable> {
 
         public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
             String line = value.toString();
@@ -54,7 +54,7 @@ public class AverageCalculator {
     }
 
     //Reducer
-    public static class ReduceForAverage extends Reducer<Text, FloatWritable, Text, FloatWritable> {
+    public static class ReduceForCount extends Reducer<Text, FloatWritable, Text, FloatWritable> {
 
         public void reduce(Text word, Iterable<FloatWritable> values, Context context) throws IOException, InterruptedException {
             float count = 0;
