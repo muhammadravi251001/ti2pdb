@@ -13,7 +13,7 @@ if __name__ == "__main__":
     spark = SparkSession(sc)
 
     # Load training data
-    data = spark.read.csv("kredit.csv")
+    data = spark.read.options(header=True, inferSchema=True).csv('kredit.csv')
 
     categorical_columns= ['OCCUPATION', ' MERK', ' STATUS']
 

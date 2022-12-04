@@ -10,8 +10,8 @@ if __name__ == "__main__":
     sc = SparkContext('local')
     spark = SparkSession(sc)
 
-    data = spark.read.csv("kredit.csv")
-    df = spark.createDataFrame(data, ("OCCUPATION", "SALARY", "INSTALLMENT", "TENOR", "USIA", "MERK", "STATUS"))
+    data = spark.read.options(header=True, inferSchema=True).csv('kredit.csv')
+    df = spark.createDataFrame(data)
 
     columns = df.columns
     columns.remove('OCCUPATION')
