@@ -11,7 +11,6 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
-
 import java.io.IOException;
 
 public class CountCalculator {
@@ -50,7 +49,7 @@ public class CountCalculator {
             String line = value.toString();
             String[] words = line.split(",");
             Text outputKey = new Text(words[0].toUpperCase().trim());
-            FloatWritable outputValue = new FloatWritable(Float.parseFloat(words[1]));
+            FloatWritable outputValue = new FloatWritable(Float.parseFloat(words[6]));
             context.write(outputKey, outputValue);
         }
     }

@@ -13,10 +13,9 @@ if __name__ == "__main__":
     spark = SparkSession(sc)
 
     # Load training data
-    data = spark.read.format("libsvm") \
-        .load("kredit.csv")
+    data = spark.read.csv("kredit.csv")
 
-    categorical_columns= ['OCCUPATION', ' MERK']
+    categorical_columns= ['OCCUPATION', ' MERK', ' STATUS']
 
     # The index of string vlaues multiple columns
     indexers = [
@@ -34,7 +33,7 @@ if __name__ == "__main__":
     assembler = VectorAssembler(inputCols=[encoder.getOutputCol() for encoder in encoders],outputCol="features")
 
     pipeline = Pipeline(stages=indexers + encoders+[assembler])
-    model=pipeline.fit(data)
+    model = pipeline.fit(data)
     transformed = model.transform(data)
 
     # Split the data into train and test
